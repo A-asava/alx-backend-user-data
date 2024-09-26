@@ -21,6 +21,24 @@ class DB:
         Base.metadata.create_all(self._engine)
         self.__session = None
 
+    def find_user_by(self, **kwargs) -> User:
+        """
+        Finds a user by arbitrary keyword arguments.
+        Raises:
+            - NoResultFound: if no user matches the query.
+            - InvalidRequestError: if the query contains invalid parameters.
+        """
+        try:
+            # Use the filter_by method to match the keyword arguments
+            user = self._session.query(User).filter_by(**kwargs).one()
+            return user
+        except NoResultFound:
+            # If no user is found
+            raise NoResultFound
+        except InvalidRequestError:
+            # If invalid keyword arguments are passed (e.g., no_email)
+            raise InvalidRequestError
+
     @property
     def _session(self) -> Session:
         """Memoized session object
@@ -37,3 +55,4 @@ class DB:
         self._session.add(user)
         self._session.commit()
         return user
+    	
